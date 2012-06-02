@@ -837,7 +837,9 @@ $(function() {
     
     var layoutController = new WfView({el:$('.main-right')});
     
-    
+    $(document).bind('touchmove', function(e) {
+    	   e.preventDefault();
+    	}, false);
 });
 
 
