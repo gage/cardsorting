@@ -135,6 +135,12 @@ JINJA2_DISABLED_APPS = (
         )
 
 TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS + (
+            'django.core.context_processors.request',
+            'django.contrib.auth.context_processors.auth',
+            'django.core.context_processors.i18n',
+            'django.core.context_processors.debug',
+            'django.core.context_processors.media',
+            'django.core.context_processors.static',
         )
 
 MIDDLEWARE_CLASSES = (
