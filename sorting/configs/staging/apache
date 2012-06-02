@@ -1,0 +1,12 @@
+<VirtualHost *:8080>
+    ServerName omg.demo.gd
+
+    WSGIScriptAlias / /home/omgtt/sites/omgtt/repository/omgtt/configs/staging/staging.wsgi
+ 
+    ErrorLog /home/omgtt/logs/omgtt.apache.error.log
+    LogLevel warn
+
+    CustomLog /home/omgtt/logs/omgtt.apache.access.log combined
+    
+    ServerSignature Off
+</VirtualHost>

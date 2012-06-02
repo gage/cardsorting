@@ -1,0 +1,233 @@
+/**
+ * Gulu reset
+ *
+ * @package     tag_reset
+ * @author      hom, gage
+ * @copyright   Copyright (C) Gulu Co., All Rights Reserved.
+ * @license     dev 1.0
+ * @link        http://www.gulu.com
+ * 
+ **/
+
+
+/**
+ * font
+ */
+.font_main_1 {
+    //font-family:"Walter Turncoat", "LiHei Pro", "微軟正黑體", "Microsoft JhengHei", "新細明體", "PMingLiU", Arial, Helvetica, sans-serif;
+    font-family:"LiHei Pro", "微軟正黑體", "Microsoft JhengHei", "新細明體", "PMingLiU", Arial, Helvetica, sans-serif;
+}
+.font_main_2 {
+    font-family:"Courier New", monospace, serif;
+}
+.font_main_3 {
+    font-family:"AlphaEchoRegular", "LiHei Pro", "微軟正黑體", "Microsoft JhengHei", "新細明體", "PMingLiU", Arial, Helvetica, sans-serif;
+}
+.font_main_4 {
+    font-family:"Bigshot One", "LiHei Pro", "微軟正黑體", "Microsoft JhengHei", "新細明體", "PMingLiU", Arial, Helvetica, sans-serif;
+}
+.font_main_5 {
+    font-family:"Cabin Sketch", "LiHei Pro", "微軟正黑體", "Microsoft JhengHei", "新細明體", "PMingLiU", Arial, Helvetica, sans-serif;
+}
+.font_main_6 {
+    font-family:Arial, Helvetica, "LiHei Pro", "微軟正黑體", "Microsoft JhengHei", "新細明體", "PMingLiU", sans-serif;
+}
+.font_main_7 {
+    font-family:"AmerTypewriterITCbyBT Bold", "LiHei Pro", "微軟正黑體", "Microsoft JhengHei", "新細明體", "PMingLiU", Arial, Helvetica, sans-serif;
+}
+.font_main_8 {
+    font-family:"texgyreheroscn", "LiHei Pro", "Microsoft JhengHei", "新細明體", "PMingLiU", Arial, Helvetica, sans-serif;
+}
+.font_main_9 {
+    font-family:"Cabin", "LiHei Pro", "Microsoft JhengHei", "新細明體", "PMingLiU", Arial, Helvetica, sans-serif;
+}
+.font_main_10 {
+    font-family:"微軟正黑體", "LiHei Pro", "Microsoft JhengHei", "新細明體", "PMingLiU", Arial, Helvetica, sans-serif;
+}
+.font_main_11 {
+    font-family:Helvetica, Arial, "LiHei Pro", "微軟正黑體", "Microsoft JhengHei", "新細明體", "PMingLiU", sans-serif;
+}
+.font_main_12 {
+    font-family:Arial, Helvetica, "LiHei Pro", "微軟正黑體", "Microsoft JhengHei", "新細明體", "PMingLiU", sans-serif;
+}
+
+
+/**
+ * tag_reset
+ **/
+
+html{
+    margin: 0px;
+    padding: 0px;
+}
+
+html {
+    height:100%;
+    body {
+        height:100%;    
+    }
+}
+
+body{
+    margin: 0px;
+    padding: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+//    color:@color_main_font;
+    /* reset webkit init font size */
+    -webkit-text-size-adjust:none;
+    //line-height:12px;
+}
+
+* {
+    margin:0; padding:0;
+}
+
+h1, h2, h3, h4, h5, h6, h7, p, form, input, button, ul, li{
+    padding: 0px;
+    margin: 0px;
+    font-weight: normal;
+}
+
+p{
+    line-height: 16px;
+    word-wrap: break-word;
+    word-break: normal;
+}
+
+ul, ol, li{
+    list-style: none;
+}
+
+dl, dt, dd{
+    margin: 0;
+    padding: 0;
+}
+
+img{vertical-align: middle;}
+
+input, select, textarea{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+//    color: @color_main_15;
+    outline:none;
+}
+
+textarea {
+    resize:none;
+}
+
+/*
+input:focus {
+    outline: none;
+}*/
+
+input::-moz-focus-inner /*Remove button padding in FF*/
+{ 
+    border: 0;
+    padding: 0;
+}
+
+input[type="submit"], input[type="button"] {
+    /* fix ios can't styleing */
+    -webkit-appearance:none;
+}
+
+label {
+    cursor:pointer;
+    * {
+        vertical-align:middle;
+    }
+    input {
+        margin-right:2px;
+    }
+}
+
+a{
+//    color: @color_6;
+    text-decoration: none;
+    outline: none;
+    &:hover, &.on, &.active {
+        outline: none;
+//        color: @color_4;
+    }
+    img{ border: 0px; outline: none;}
+    &.underline{
+        &:hover{
+            text-decoration: underline;
+        }
+    }
+    &.blod {
+        font-weight:bold;
+    }
+}
+
+table{
+    border-spacing: 0px;
+}
+
+.tb{display:table}
+.tr{display:table-row}
+.td{display:table-cell}
+
+table, tr, th, td {
+    margin:0; padding:0;
+    border-collapse:collapse;
+    vertical-align:top;
+}
+td {
+    &.vb {
+        vertical-align:bottom;
+    }
+    &.ar {
+        text-align:right;
+    }
+}
+
+var {
+    display:none;
+}
+
+:link, visited, ins{
+    text-decoration: none;
+}
+
+::selection {
+    background:#ccc;
+    color:#fff;
+}
+
+::-moz-selection {
+    background:#ccc;
+    color:#fff;
+}
+
+::-webkit-selection {
+    background:#ccc;
+    color:#fff;
+}
+
+
+/* Remove button padding in FF */
+button::-moz-focus-inner {
+    border:0;
+    padding:0;
+}
+
+
+/*
+ * placeholder
+ */
+
+::-webkit-input-placeholder {
+//    color: @color_6;
+}
+:-moz-placeholder {
+//    color: @color_6;
+}
+
+.placeholder {
+//    color: @color_6;
+}
+
+

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet/less" href="{{ STATIC_URL }}less/reset.less" type="text/css" />
+    <link rel="stylesheet/less" href="{{ STATIC_URL }}less/base.less" type="text/css" />
+    <script type="text/javascript" src="{{ STATIC_URL }}js/lib/less.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/lib/underscore-min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/lib/backbone-min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui-1.8.20.custom.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.ba-throttle-debounce.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/base.js"></script>
+</head>
+<body>
+    <div class="main-contain">
+        <div class="main-hd">
+            <h1>Hi! Let's Sort!</h1>
+            <button class="main-info">Introduce</button>
+        </div>
+        <div class="main-bd">
+	        <div class="main-left">
+	            <ul class="sorting-items connectedSortable">
+	                <li class="title">Applications</li>
+	            </ul>
+	        </div>
+	        <div class="main-right">
+	           <div class="wfItemWrapper">
+		           <button class="add-new">+ Add Category</button>
+               </div>
+	        </div>
+        </div>
+        <div class="main-ft">
+        </div>
+        <button class="main-done">Done</button>
+        <button class="main-next">Next &gt;</button>
+    </div>
+<script type="text/template" id="template_sorting_class">
+<div class="sorting-class">
+    <h3><span><%=name%></span><input type="text"></h3>
+    <ul class="sorting-items sorting-class-items connectedSortable c1">
+    </ul>
+</div>
+</script>
+<script type="text/template" id="template_introduce1">
+<div class="lb_intro_wrapper">
+    <h1>introduce1</h1>
+</div>
+</script>
+<script type="text/template" id="template_introduce2">
+<div class="lb_intro_wrapper">
+    <h1>introduce2</h1>
+</div>
+</script>
+<script type="text/template" id="template_info_tip">
+<div class="lb_intro_wrapper">
+    <h1><%=title%></h1>
+    <p><%=description%></p>
+</div>
+</script>
+<script type="text/template" id="template_klass">
+<div class="sorting-class">
+    <h3><span></span><input type="text"></h3>
+    <ul class="sorting-items sorting-class-items connectedSortable c1">
+    </ul>
+</div>
+</script>
+</body>

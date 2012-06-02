@@ -1,0 +1,18 @@
+#!/bin/sh
+SITE_NAME="sorting"
+
+[ ! "$SITE_NAME" ] && echo "You need to specify the SITE_NAME variable in ./manage" && exit 1
+
+#if [[ $1 && ( $1 == "startapp" ) ]] ; then
+if [ $1 = "startapp" ] ; then
+    # check whether the 2rd argument exist
+    [ ! $2 ] && echo "Usage: ./manage startapp app-name\nError: Argument missing." && exit 1;
+    python ./$SITE_NAME/configs/common/manage.py $*;
+    # checking whether the app had been built successfully.
+    [ ! $? ] && echo "There's an error occured while the previous progress." && exit 1;
+    
+    mv ./$SITE_NAME/configs/common/$2 ./$SITE_NAME/apps/;
+else
+    python ./$SITE_NAME/configs/${DEPLOYMENT_TARGET:="common"}/manage.py $* ;
+fi
+

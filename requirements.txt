@@ -1,0 +1,18 @@
+### omg.TT requirements
+###
+### Please use comments to label which app(s) your requirements are used in.
+
+# infrastructure
+pymongo
+pysolr
+redis
+jinja2
+
+# app-specific requirements
+django-imagekit==0.3.6          # photos
+PIL                             # photos
+BeautifulSoup # feed
+lxml # feed
+chardet #feed
+django-autoslug #article
+python-twitter
