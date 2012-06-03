@@ -614,9 +614,9 @@ var CateCollection = Backbone.Collection.extend({
 });
 
 var Test1CateCollection = new CateCollection([
-    {name:'CLASS Sub 1',items:{}},
-    {name:'CLASS Sub 2',items:{}},
-    {name:'CLASS Sub 3',items:{}},
+    {name:'CLASS Sub 1',items:{}, id:guid()},
+    {name:'CLASS Sub 2',items:{}, id:guid()},
+    {name:'CLASS Sub 3',items:{}, id:guid()},
 ]);
 
 var Test2CateCollection = new CateCollection([
@@ -856,7 +856,7 @@ var AllClassesView = Backbone.View.extend({
 	},
 	
 	addNewCate: function(){
-		this.collection.add({name:'', id:guid()});
+		this.collection.add({name:'', id:guid(), items:{}});
 	},
 	
 	render: function(){
