@@ -1,3 +1,7 @@
+var Sorting = Sorting || {};
+Sorting.Collection = Sorting.Collection || {};
+Sorting.Views = Sorting.Views || {};
+
 function S4() {
    return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
 }
@@ -561,7 +565,7 @@ var ItemCollection = Backbone.Collection.extend({
 	}
 });
 
-var Test1Collection = new ItemCollection([
+Sorting.Collection.Test1Collection = new ItemCollection([
     {name: 'gage', description: 'des gage'},
     {name: 'rita', description: 'des rita'},
     {name: 'love', description: 'des love'},
@@ -595,13 +599,30 @@ var CateModel = Backbone.Model.extend({
 		var tmp = this.get('items');
 		delete tmp[item.get('name')];
 	}
+	
 });
 
 var CateCollection = Backbone.Collection.extend({
-	model: CateModel
+	model: CateModel,
+	
+	initialize: function(){
+		_.bindAll(this, 'getValidCates');
+	},
+	
+	getValidCates: function(){
+		return _.filter(this.models, function(cate){
+			return cate.get('items') != {}
+		});
+	}
 });
 
 var Test1CateCollection = new CateCollection([
+    {name:'CLASS Sub 1'},
+    {name:'CLASS Sub 2'},
+    {name:'CLASS Sub 3'},
+]);
+
+var Test2CateCollection = new CateCollection([
     {name:'CLASS 1'},
     {name:'CLASS 2'},
     {name:'CLASS 3'},
@@ -649,31 +670,60 @@ function receiveAction(e, ui){
 		var sender_view = ui.sender.parents('.sorting-class').data('view');
 		sender_view.model.removeItem(view.model);
 	}
-	if(Test1Collection.isOk()){
-		$('.main-next').addClass('ok');
+	if(Sorting.Views.allClassesView.state == 1){
+		if(Sorting.Collection.Test1Collection.isOk()){
+			$('.main-next').addClass('ok');
+		}else{
+			$('.main-next').removeClass('ok');
+		}
 	}else{
-		$('.main-next').removeClass('ok');
+		if(Sorting.Collection.Test2Collection.isOk()){
+			$('.main-done').addClass('ok');
+		}else{
+			$('.main-done').removeClass('ok');
+		}
 	}
+	
 }
 
 var CateView = Backbone.View.extend({
 	
 	initialize: function(options){
-		_.bindAll(this, 'onChangeName', '_validate', '_saveText', 'onBlur', 'onEnter');
+		_.bindAll(this, 'render', 'onChangeName', '_validate', '_saveText', 'onBlur', 'onEnter');
 		this.name = options.name;
 		this.isnew = options.isnew;
-		this.$label = this.$el.find('h3>span');
-		this.$input = this.$el.find('h3>input');
-		this.$el.data('view', this);
-		if(this.isnew){
-			this.onChangeName();
-		}
+		this.container = options.container;
+		this.render();
 	},
 	
 	events: {
 		'click h3>span': 'onChangeName',
 		'blur h3>input': 'onBlur',
 		'keyup h3>input': 'onEnter'
+	},
+	
+	render: function(){
+		if(this.model)
+			var name = this.model.get('name');
+		else
+			var name = '';
+		var tmp = _.template($('#template_sorting_class').html());
+		var tmpHtml = tmp({name:name});
+		var that = $(tmpHtml);
+		if(this.isnew){
+			this.container.$('.add-new').after(that);
+		}else{
+			this.container.$el.append(that);
+		}
+		this.setElement(that);
+		
+		this.$label = this.$el.find('h3>span');
+		this.$input = this.$el.find('h3>input');
+		this.$el.data('view', this);
+		
+		if(this.isnew){
+			this.onChangeName();
+		}
 	},
 	
 	onChangeName: function(){
@@ -685,12 +735,11 @@ var CateView = Backbone.View.extend({
 	
 	_validate: function(v){
 		var ok = true;
-		$('.sorting-class').each(function(i, obj){
-			if($(obj).find('h3>span').text() == v){
-				ok = false;
-				return false;
-			}
+		var getit = _.find(this.container.collection.models, function(cate){
+			return cate.get('name') == v;
 		});
+		if(getit)
+			ok = false;
 		return ok;
 	},
 	
@@ -701,6 +750,8 @@ var CateView = Backbone.View.extend({
 		}else{
 			if(this.isnew){
 				this.$el.remove();
+				this.container.collection.remove(this.container.collection.get(''));
+				return
 			}
 		}
 		this.$label.text(this.name);
@@ -712,6 +763,7 @@ var CateView = Backbone.View.extend({
 	        	receive: receiveAction,
 		    }).disableSelection();
 			this.isnew = false;
+			this.container.collection.get('').set({name:this.name});
 		}
 	},
 	
@@ -734,11 +786,12 @@ var LeftControlView = Backbone.View.extend({
 	el: '.main-bd .main-left .sorting-items',
 	
 	initialize: function(options){
-		_.bindAll(this, 'render');
+		_.bindAll(this, 'render', 'clean');
 		this.render();
 	},
 	
 	render: function(){
+		this.clean();
 		var _this = this;
 		_.each(this.collection.models, function(item){
 			var that = $('<li><span class="name">'+item.get('name')+'</span><span class="info">?</span>');
@@ -750,6 +803,16 @@ var LeftControlView = Backbone.View.extend({
 	    		model: item
 	    	});
 		});
+		
+		this.$el.sortable({
+	        connectWith: ".connectedSortable",
+	        items: "li:not(.title)",
+	        receive: receiveAction
+	    }).disableSelection();
+	},
+	
+	clean: function(){
+		this.$('li:not(.title)').remove();
 	}
 	
 });
@@ -759,25 +822,86 @@ var AllClassesView = Backbone.View.extend({
 	el: '.main-bd .main-right',
 	
 	initialize: function(options){
-		_.bindAll(this, 'render');
+		_.bindAll(this, 'render', 'addNewCate', 'onAdd', 'onNext', 'clean', 'onDone');
 		this.render();
+		this.state = 1;
+	},
+	
+	events: {
+		'click .add-new': 'addNewCate',
+		'click .main-next': 'onNext',
+		'click .main-done': 'onDone'
+	},
+	
+	addNewCate: function(){
+		this.collection.add({name:''});
 	},
 	
 	render: function(){
+		this.clean();
 		var _this = this;
 		var tmp = _.template($('#template_sorting_class').html());
 		
 		_.each(this.collection.models, function(cate){
-			var tmpHtml = tmp({name:cate.get('name')});
-			var that = $(tmpHtml);
-			_this.$el.append(that);
-			cate.view = new CateView({
-	    		el: that,
-	    		name: cate.get('name'),
-	    		isnew: false,
-	    		model:cate
-	    	});
+			_this.onAdd(cate, false);
 		});
+		
+		this.collection.on('add', this.onAdd);
+		
+	},
+	
+	clean: function(){
+		this.$('.sorting-class').remove();
+	},
+	
+	onAdd: function(cate, isnew){
+		if(isnew!==false)
+			isnew = true
+		cate.view = new CateView({
+    		name: cate.get('name'),
+    		isnew: isnew,
+    		model:cate,
+    		container: this
+    	});
+		
+		cate.view.$(".sorting-items").sortable({
+	        connectWith: ".connectedSortable",
+	        items: "li:not(.title)",
+	        receive: receiveAction
+	    }).disableSelection();
+	},
+	
+	onNext: function(){
+		if(Sorting.Collection.Test1Collection.isOk()){
+			Sorting.Views.leftControlView.$('.title').text('Sub Categories');
+			var validT1Cates = Test1CateCollection.getValidCates();
+			Sorting.Collection.Test2Collection = new ItemCollection();
+			_.each(validT1Cates, function(cate){
+				Sorting.Collection.Test2Collection.add({name: cate.get('name'), description: ''});
+			});
+			Sorting.Views.leftControlView.collection = Sorting.Collection.Test2Collection;
+			Sorting.Views.leftControlView.render();
+			
+			Sorting.Views.allClassesView.collection = Test2CateCollection;
+			Sorting.Views.allClassesView.render();
+			
+			this.$('.main-next').hide();
+			this.$('.main-done').show();
+			
+			this.state = 2;
+			
+		}else{
+			alert('Please put every Appliction into a category.')
+		}
+	},
+	
+	onDone: function(){
+		if(Sorting.Collection.Test2Collection.isOk()){
+			
+			
+		}else{
+			alert('Please put every sub category into a main category.')
+		}
 	}
 });
 
@@ -802,20 +926,14 @@ $(function() {
 //        verticalCenter: true
 //    });
 	
-	var leftControlView = new LeftControlView({
-		collection: Test1Collection
+	Sorting.Views.leftControlView = new LeftControlView({
+		collection: Sorting.Collection.Test1Collection
 	});
 	
-    var allClassesView = new AllClassesView({
+	Sorting.Views.allClassesView = new AllClassesView({
     	collection: Test1CateCollection
     });
 	
-    $(".sorting-items").sortable({
-        connectWith: ".connectedSortable",
-        items: "li:not(.title)",
-        receive: receiveAction
-    }).disableSelection();
-    
     $('.main-hd button.main-info').click(function(){
     	$.fn.Lightbox('inline', {
             instantShow: true,
@@ -823,16 +941,6 @@ $(function() {
             bgColor: 'white_bg',
             verticalCenter: true
         });
-    });
-    
-    $('.main-right .add-new').click(function(){
-    	var newklass = $($('#template_klass').html());
-    	$(this).after(newklass);
-    	new CateView({
-    		el: newklass,
-    		name: newklass.find('h3>span').text(),
-    		isnew: true
-    	});
     });
     
     var layoutController = new WfView({el:$('.main-right')});
