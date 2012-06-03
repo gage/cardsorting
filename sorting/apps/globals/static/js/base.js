@@ -643,7 +643,6 @@ var ItemView = Backbone.View.extend({
 	},
 	
 	onInfo: function(e){
-		console.log(2233);
 		if(e){
 			var tmp = _.template($('#template_info_tip').html());
 			var tmpHtml = tmp({title:this.name, description:this.description});
