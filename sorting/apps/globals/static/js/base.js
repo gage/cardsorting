@@ -566,19 +566,19 @@ var ItemCollection = Backbone.Collection.extend({
 });
 
 Sorting.Collection.Test1Collection = new ItemCollection([
-    {name: 'gage', description: 'des gage'},
-    {name: 'rita', description: 'des rita'},
-    {name: 'love', description: 'des love'},
-    {name: 'gage1', description: 'des gage1'},
-    {name: 'rita1', description: 'des rita1'},
-    {name: 'love1', description: 'des love1'},
-    {name: 'gage2', description: 'des gage2'},
-    {name: 'rita2', description: 'des rita2'},
-    {name: 'love2', description: 'des love2'}
+    {name: 'gage', description: 'des gage', cate:''},
+    {name: 'rita', description: 'des rita', cate:''},
+    {name: 'love', description: 'des love', cate:''},
+    {name: 'gage1', description: 'des gage1', cate:''},
+    {name: 'rita1', description: 'des rita1', cate:''},
+    {name: 'love1', description: 'des love1', cate:''},
+    {name: 'gage2', description: 'des gage2', cate:''},
+    {name: 'rita2', description: 'des rita2', cate:''},
+    {name: 'love2', description: 'des love2', cate:''}
 ]);
 
 var CateModel = Backbone.Model.extend({
-	idAttribute: 'name',
+//	idAttribute: 'name',
 	
 	defaults: {
 		name: '',
@@ -590,14 +590,11 @@ var CateModel = Backbone.Model.extend({
 	},
 	
 	addItem: function(item){
-		var tmp = this.get('items');
-		tmp[item.get('name')] = item.get('name');
-		this.set('items', tmp);
+		this.get('items')[item.get('name')] = item.get('name');
 	},
 	
 	removeItem: function(item){
-		var tmp = this.get('items');
-		delete tmp[item.get('name')];
+		delete this.get('items')[item.get('name')];
 	}
 	
 });
@@ -617,15 +614,15 @@ var CateCollection = Backbone.Collection.extend({
 });
 
 var Test1CateCollection = new CateCollection([
-    {name:'CLASS Sub 1'},
-    {name:'CLASS Sub 2'},
-    {name:'CLASS Sub 3'},
+    {name:'CLASS Sub 1',items:{}},
+    {name:'CLASS Sub 2',items:{}},
+    {name:'CLASS Sub 3',items:{}},
 ]);
 
 var Test2CateCollection = new CateCollection([
-    {name:'CLASS 1'},
-    {name:'CLASS 2'},
-    {name:'CLASS 3'},
+    {name:'CLASS 1',items:{}},
+    {name:'CLASS 2',items:{}},
+    {name:'CLASS 3',items:{}},
 ]);
 
 var ItemView = Backbone.View.extend({
@@ -656,33 +653,45 @@ var ItemView = Backbone.View.extend({
 	}
 })
 
+function nextDoneSwitch(){
+	if(Sorting.Views.allClassesView.state == 1){
+		if(Sorting.Collection.Test1Collection.isOk()){
+			Sorting.Views.allClassesView.$('.main-next').addClass('ok');
+		}else{
+			Sorting.Views.allClassesView.$('.main-next').removeClass('ok');
+		}
+	}else{
+		if(Sorting.Collection.Test2Collection.isOk()){
+			Sorting.Views.allClassesView.$('.main-done').addClass('ok');
+		}else{
+			Sorting.Views.allClassesView.$('.main-done').removeClass('ok');
+		}
+	}
+}
+
 function receiveAction(e, ui){
 	var view = ui.item.data('view');
 	var t_view = $(e.target).parents('.sorting-class').data('view');
+	var sender_view = ui.sender.parents('.sorting-class').data('view');
+	
 	if(t_view){
 		view.cate = t_view.name;
 		view.model.set('cate', t_view.name);
 		t_view.model.addItem(view.model);
+		if(sender_view){
+			sender_view.model.removeItem(view.model);
+		}
 	}else{
 		view.cate = '';
 		view.model.set('cate', '');
-		var sender_view = ui.sender.parents('.sorting-class').data('view');
 		sender_view.model.removeItem(view.model);
 	}
-	if(Sorting.Views.allClassesView.state == 1){
-		if(Sorting.Collection.Test1Collection.isOk()){
-			$('.main-next').addClass('ok');
-		}else{
-			$('.main-next').removeClass('ok');
-		}
-	}else{
-		if(Sorting.Collection.Test2Collection.isOk()){
-			$('.main-done').addClass('ok');
-		}else{
-			$('.main-done').removeClass('ok');
-		}
-	}
 	
+	if(sender_view && ui.sender.find('li').size()==0 && sender_view.model.get('name')==''){
+		Sorting.Views.allClassesView.collection.remove(sender_view.model);
+		sender_view.$el.remove();
+	}
+	nextDoneSwitch();
 }
 
 var CateView = Backbone.View.extend({
@@ -743,27 +752,41 @@ var CateView = Backbone.View.extend({
 	},
 	
 	_saveText: function(){
+		var _this = this;
 		var value = this.$input.val().trim();
 		if(value && this._validate(value)){
-			this.name = value;			
+			this.name = value;
 		}else{
 			if(this.isnew){
-				this.$el.remove();
-				this.container.collection.remove(this.container.collection.get(''));
-				return
+				if(this.$('.sorting-items li').size() == 0){
+					this.$el.remove();
+					this.container.collection.remove(this.container.collection.get(''));
+					return
+				}
 			}
 		}
-		this.$label.text(this.name);
-		this.$input.hide();
-		this.$label.show();
+		
+		if(this.name != ''){
+			this.$label.text(this.name);
+			this.$input.hide();
+			this.$label.show();
+			this.$input.css('border', '0px');
+		}else{
+			this.$input.css('border', '1px solid #C30');
+		}
+		
 		if(this.isnew){
 			this.$(".sorting-items").sortable({
 		        connectWith: ".connectedSortable",
 	        	receive: receiveAction,
 		    }).disableSelection();
 			this.isnew = false;
-			this.container.collection.get('').set({name:this.name});
 		}
+		this.model.set({name:this.name});
+		_.each(this.model.get('items'), function(name){
+			Sorting.Views.leftControlView.collection.get(name).set('cate', _this.name);
+		});
+		nextDoneSwitch();
 	},
 	
 	onBlur: function(e){
@@ -833,7 +856,7 @@ var AllClassesView = Backbone.View.extend({
 	},
 	
 	addNewCate: function(){
-		this.collection.add({name:''});
+		this.collection.add({name:'', id:guid()});
 	},
 	
 	render: function(){
@@ -890,7 +913,7 @@ var AllClassesView = Backbone.View.extend({
 			this.state = 2;
 			
 		}else{
-			alert('Please put every Appliction into a category.')
+			alert('Please put every Appliction into a category and make sure every categroy has been named.')
 		}
 	},
 	
@@ -907,7 +930,7 @@ var AllClassesView = Backbone.View.extend({
 
 function resize_all(){
 	var h = Math.max(274, $(window).height()-60);
-	var w = Math.max(236, $(window).width()-238);
+	var w = Math.max(236, $(window).width()-250);
 	$('.main-left, .main-left .sorting-items').height(h);
 	$('.main-right').width(w);
 }
