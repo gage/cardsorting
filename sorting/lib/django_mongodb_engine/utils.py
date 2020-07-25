@@ -57,8 +57,8 @@ class CollectionDebugWrapper(object):
         logger.debug(msg, extra={'duration' : duration})
 
     def find(self, *args, **kwargs):
-        if not 'slave_okay' in kwargs and self.collection.slave_okay:
-            kwargs['slave_okay'] = True
+        if not 'subordinate_okay' in kwargs and self.collection.subordinate_okay:
+            kwargs['subordinate_okay'] = True
         return DebugCursor(self, self.collection, *args, **kwargs)
 
     def logging_wrapper(method):
